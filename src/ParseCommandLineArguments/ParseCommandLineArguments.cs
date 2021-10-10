@@ -886,5 +886,88 @@ namespace ParseCommandLineArguments
 
             if (started) yield return result.ToString();
         }
+
+        /// <summary>
+        /// <para>Mikescher implementation modified by SandRock to return the index of each token.</para>
+        /// </summary>
+        public static IEnumerable<string> Mikescher_PlusIndex(string commandLine)
+        {
+            return Mikescher_PlusIndexImpl(commandLine).Select(x => x.Value);
+        }
+
+        /// <summary>
+        /// <para>Mikescher implementation modified by SandRock to return the index of each token.</para>
+        /// </summary>
+        /// <param name="commandLine"></param>
+        /// <returns>the index as key and the value</returns>
+        private static IEnumerable<KeyValuePair<int, string>> Mikescher_PlusIndexImpl(string commandLine)
+        {
+            var result = new StringBuilder();
+
+            var quoted = false;
+            var escaped = false;
+            var started = false;
+            var allowcaret = false;
+            for (int i = 0; i < commandLine.Length; i++)
+            {
+                var chr = commandLine[i];
+
+                if (chr == '^' && !quoted)
+                {
+                    if (allowcaret)
+                    {
+                        result.Append(chr);
+                        started = true;
+                        escaped = false;
+                        allowcaret = false;
+                    }
+                    else if (i + 1 < commandLine.Length && commandLine[i + 1] == '^')
+                    {
+                        allowcaret = true;
+                    }
+                    else if (i + 1 == commandLine.Length)
+                    {
+                        result.Append(chr);
+                        started = true;
+                        escaped = false;
+                    }
+                }
+                else if (escaped)
+                {
+                    result.Append(chr);
+                    started = true;
+                    escaped = false;
+                }
+                else if (chr == '"')
+                {
+                    quoted = !quoted;
+                    started = true;
+                }
+                else if (chr == '\\' && i + 1 < commandLine.Length && commandLine[i + 1] == '"')
+                {
+                    escaped = true;
+                }
+                else if (chr == ' ' && !quoted)
+                {
+                    if (started)
+                    {
+                        yield return new KeyValuePair<int, string>(i, result.ToString());
+                    }
+                    
+                    result.Clear();
+                    started = false;
+                }
+                else
+                {
+                    result.Append(chr);
+                    started = true;
+                }
+            }
+
+            if (started)
+            {
+                yield return new KeyValuePair<int, string>(0, result.ToString());
+            }
+        }
     }
 }

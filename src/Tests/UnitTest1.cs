@@ -139,6 +139,13 @@ namespace Tests
             Test(input, nameof(Mikescher), ParseCommandLineArguments.Mikescher);
         }
 
+        [Theory]
+        [ClassData(typeof(TestInputs))]
+        public void Mikescher_PlusIndex(TestInput input)
+        {
+            Test(input, nameof(Mikescher_PlusIndex), ParseCommandLineArguments.Mikescher_PlusIndex);
+        }
+
         private void Test(TestInput input, string name, Func<string, IEnumerable<string>> method)
         {
             try
