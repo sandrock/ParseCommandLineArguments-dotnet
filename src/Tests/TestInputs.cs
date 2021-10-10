@@ -1,3 +1,8 @@
+// Mix of sources from https://stackoverflow.com/questions/298830/split-string-containing-command-line-parameters-into-string-in-c-sharp
+// Originally made by Mikescher at https://gist.github.com/Mikescher/a1450d13980f4363b47cdab5430b411a
+// Assembled as a .net project by SandRock
+// Licensed under "CC BY-SA 4.0" (specified by Stackoverflow's rules)
+
 namespace Tests
 {
     using System;
@@ -66,6 +71,9 @@ namespace Tests
 
             yield return Test(44, "\"C:\\Program Files\"", new[] { "C:\\Program Files" });
             yield return Test(45, "\"He whispered to her \\\"I love you\\\".\"", new[] { "He whispered to her \"I love you\"." });
+            
+            // Test cases by SandRock
+            yield return Test(46, "/wait 5000 / arg1 arg2", new[] { "/wait", "5000", "/", "arg1", "arg2", });
         }
 
         IEnumerator IEnumerable.GetEnumerator()
