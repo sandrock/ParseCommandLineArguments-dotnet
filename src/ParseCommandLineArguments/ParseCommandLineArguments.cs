@@ -899,7 +899,7 @@ namespace ParseCommandLineArguments
         /// </summary>
         /// <param name="commandLine"></param>
         /// <returns>the index as key and the value</returns>
-        private static IEnumerable<KeyValuePair<int, string>> Mikescher_PlusIndexImpl(string commandLine)
+        public static IEnumerable<KeyValuePair<int, string>> Mikescher_PlusIndexImpl(string commandLine)
         {
             var result = new StringBuilder();
 
@@ -907,6 +907,7 @@ namespace ParseCommandLineArguments
             var escaped = false;
             var started = false;
             var allowcaret = false;
+            int start = 0;
             for (int i = 0; i < commandLine.Length; i++)
             {
                 var chr = commandLine[i];
@@ -941,6 +942,10 @@ namespace ParseCommandLineArguments
                 {
                     quoted = !quoted;
                     started = true;
+                    if (quoted)
+                    {
+                        start = i + 1;
+                    }
                 }
                 else if (chr == '\\' && i + 1 < commandLine.Length && commandLine[i + 1] == '"')
                 {
@@ -950,11 +955,12 @@ namespace ParseCommandLineArguments
                 {
                     if (started)
                     {
-                        yield return new KeyValuePair<int, string>(i, result.ToString());
+                        yield return new KeyValuePair<int, string>(start, result.ToString());
                     }
                     
                     result.Clear();
                     started = false;
+                    start = i + 1;
                 }
                 else
                 {
@@ -965,7 +971,7 @@ namespace ParseCommandLineArguments
 
             if (started)
             {
-                yield return new KeyValuePair<int, string>(0, result.ToString());
+                yield return new KeyValuePair<int, string>(start, result.ToString());
             }
         }
     }
